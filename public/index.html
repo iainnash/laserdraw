@@ -1,29 +1,59 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Test Canvas Drawing</title>
-
+    <title>Test Canvas Drawing</title>
+    <style>
+        body {
+            padding: 10%;
+        }
+    </style>
 </head>
 <body>
+    <script src="https://unpkg.com/roughjs@3.0.0/dist/rough.js"></script>
+
     <canvas id="c">u need canvases</canvas>
+    <canvas id="rc">u need canvases</canvas>
 
     <script type="text/javascript">
         const canvas = document.getElementById('c');
+        const rc = rough.canvas(document.getElementById('rc'))
         const ctx = canvas.getContext('2d');
 
         fetch('/drawing').then(r => r.json()).then((json) => {
-            // Ideally the drawing would appear on the canvas,
-            //  the drawingId and coordinates would be sent back to the server
-            //  & the server would interpolate and push the drawing data to the laser
-            for (const part of json.drawing) {
-                ctx.moveTo(part[0][0], part[1][0]);
-                for (let i = 1; i < part[0].length; i++) {
-                    const x = part[0][i], y = part[1][i];
-                    ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-            }
+            drawPoints(json.drawing);
         });
+
+        function jitter(point) {
+            return point + ((Math.random() * 3) - 0.5);
+        }
+
+        function drawPoints(drawing) {
+            setInterval(updateDrawing, 200);
+            updateDrawing();
+            function updateDrawing() {
+                ctx.clearRect(0, 0, document.getElementById('c').width, document.getElementById('c').height);
+                rc.ctx.clearRect(0, 0, document.getElementById('rc').width, document.getElementById('rc').height);
+                const svgCommand = [];
+
+                // Ideally the drawing would appear on the canvas,
+                //  the drawingId and coordinates would be sent back to the server
+                //  & the server would interpolate and push the drawing data to the laser
+                for (const part of drawing) {
+                    ctx.moveTo(part[0][0], part[1][0]);
+                    svgCommand.push(`M ${jitter(part[0][0])} ${jitter(part[1][0])}`);
+                    for (let i = 1; i < part[0].length; i++) {
+                        const x = part[0][i], y = part[1][i];
+                        ctx.lineTo(jitter(x), jitter(y));
+                        svgCommand.push(`L ${jitter(x)} ${jitter(y)}`);
+                    }
+                    ctx.stroke();
+                    svgCommand.push('Z');
+                }
+
+                rc.path(svgCommand.join(' '), {fill: 'purple'});
+            }
+        }
+
     </script>
 </body>
 </html>
