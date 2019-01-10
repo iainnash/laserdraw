@@ -19,7 +19,7 @@ class HeliosPoint(ctypes.Structure):
                 ('i', ctypes.c_uint8)]
 
 #Load and initialize library
-HeliosLib = ctypes.cdll.LoadLibrary("./libHeliosDacAPI.so")
+HeliosLib = ctypes.cdll.LoadLibrary("./libHeliosDacAPI.dylib")
 numDevices = HeliosLib.OpenDevices()
 print("Found ", numDevices, "Helios DACs")
 

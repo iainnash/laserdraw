@@ -33,7 +33,7 @@ parseSimplifiedDrawings("data/full_simplified_t-shirt.ndjson", function(err, dra
 
 
 app.get('/t-shirts', (req, res) => res.send({drawings}));
-app.get('/drawing', (req, res) => res.send(drawings[0]))
+app.get('/drawing', (req, res) => res.send(drawings[Math.floor(Math.random()*drawings.length)]))
 app.use(express.static('public'));
 
 app.listen(port, () => console.log('listening on http://localhost:3030/'));
