@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Test Canvas Drawing</title>
+    <style>
+        body {
+            padding: 10%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100%;
+            min-height: 100%;
+        }
+    </style>
+</head>
+<body onClick="drawPoints()">
+    <script src="https://unpkg.com/roughjs@3.0.0/dist/rough.js"></script>
+
+    <!-- <canvas id="c">u need canvases</canvas> -->
+    <canvas width="600" height="600" id="rc">u need canvases</canvas>
+
+    <script type="text/javascript">
+				let drawing = null;
+        var ws = new WebSocket('ws://localhost:8080');
+        console.log('connecting...');
+        ws.onopen = function() {
+            console.log('connected');
+            setInterval(() => {
+                if (drawing) {
+                    ws.send(JSON.stringify({data: drawing}));
+                }
+            }, 400);
+        }
+
+
+
+        function drawPoints() {
+            setInterval(updateDrawing, 400);
+            updateDrawing();
+						if (!drawing) { drawing = []; }
+            function updateDrawing() {
+							const out = [];
+							for (var i = 0; i < 2000; i += 100) {
+								for (var j = 0; j < 2000; j += 50) {
+									if (Math.random() < 0.1) {
+										out.push([i, j, true]);
+									} else {
+										out.push([i, j, false]);
+									}
+								}
+							}
+							/*
+							for (var ij = 0; ij < 2000; ij+=80) {
+								for (var i = 0; i < 2000; i+=80) {
+									if (i % 240 == 0 || ij % 240 == 0) {
+										out.push([i, ij, true]);
+									} else {
+										out.push([i, ij, false]);
+									}
+								}
+								out.push([i, ij, false]);
+							}
+							for (var i = 2000 ; i > 0; i-=50) {
+								out.push([i, i, false]);
+							}
+							*/
+							drawing = out;
+
+            }
+        }
+    </script>
+</body>
+</html>
